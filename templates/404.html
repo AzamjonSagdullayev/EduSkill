@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}404 — Sahifa topilmadi{% endblock %}
+{% block content %}
+<div class="error-page">
+    <div class="error-code">404</div>
+    <h1>Sahifa topilmadi</h1>
+    <p>Siz qidirayotgan sahifa mavjud emas yoki ko'chirilgan.</p>
+    <div class="error-actions">
+        <a href="{% url 'courses:home' %}" class="btn btn-primary">Bosh sahifaga qaytish</a>
+        <a href="{% url 'courses:course_list' %}" class="btn btn-outline">Kurslar</a>
+    </div>
+</div>
+{% endblock %}

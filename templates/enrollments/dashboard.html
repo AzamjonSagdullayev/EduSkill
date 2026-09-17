@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <div class="dashboard-header">
+        <div>
+            <h1>Salom, {{ user.first_name|default:user.username }}! 👋</h1>
+            <p class="text-muted">O'z ta'lim jarayoningizni kuzating</p>
+        </div>
+        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Yangi kurs
+        </a>
+    </div>
+
+    <!-- Statistika -->
+    <div class="stats-grid">
+        <div class="stat-card stat-card--blue">
+            <div class="stat-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ total_enrolled }}</span>
+                <span class="stat-label">Yozilgan kurslar</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--green">
+            <div class="stat-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ completed_count }}</span>
+                <span class="stat-label">Tugatilgan</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--purple">
+            <div class="stat-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ in_progress_count }}</span>
+                <span class="stat-label">Jarayonda</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--orange">
+            <div class="stat-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ certs_count }}</span>
+                <span class="stat-label">Sertifikatlar</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--teal">
+            <div class="stat-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ avg_score }}%</span>
+                <span class="stat-label">O'rtacha quiz</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mening kurslarim -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2>Mening kurslarim</h2>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline btn-sm">Yangi kurs topish</a>
+        </div>
+
+        {% if enrollments %}
+        <div class="dashboard-courses-grid">
+            {% for enrollment in enrollments %}
+            <div class="dashboard-course-card">
+                {% if enrollment.course.image %}
+                <img src="{{ enrollment.course.image.url }}" alt="{{ enrollment.course.title }}" class="dashboard-course-img">
+                {% else %}
+                <div class="dashboard-course-img-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                {% endif %}
+                <div class="dashboard-course-body">
+                    <div class="dashboard-course-meta">
+                        <span class="badge badge-category">{{ enrollment.course.category.name }}</span>
+                        {% if enrollment.completed %}
+                        <span class="badge badge-success">✓ Tugallangan</span>
+                        {% endif %}
+                    </div>
+                    <h3>{{ enrollment.course.title }}</h3>
+                    <div class="progress-wrapper">
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" style="width: {{ enrollment.progress }}%"></div>
+                        </div>
+                        <span class="progress-text">{{ enrollment.progress }}%</span>
+                    </div>
+                    <div class="dashboard-course-footer">
+                        <span class="text-muted text-sm">{{ enrollment.enrolled_at|date:"d.m.Y" }}</span>
+                        {% if enrollment.completed %}
+                        <a href="{% url 'courses:course_detail' slug=enrollment.course.slug %}" class="btn btn-outline btn-sm">Ko'rish</a>
+                        {% else %}
+                        {% with lesson=enrollment.course.lessons.first %}
+                        {% if lesson %}
+                        <a href="{% url 'enrollments:lesson_detail' course_slug=enrollment.course.slug lesson_id=lesson.pk %}" class="btn btn-primary btn-sm">Davom ettirish</a>
+                        {% endif %}
+                        {% endwith %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-block">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <h3>Hali kursga yozilmadingiz</h3>
+            <p>Qiziqarli kurslarni toping va o'rganishni boshlang.</p>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Kurslarni ko'rish</a>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Sertifikatlar -->
+    {% if certificates %}
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2>Sertifikatlar</h2>
+            <a href="{% url 'certificates:certificate_list' %}" class="btn btn-outline btn-sm">Barchasini ko'rish</a>
+        </div>
+        <div class="certs-grid">
+            {% for cert in certificates %}
+            <div class="cert-mini-card">
+                <div class="cert-mini-icon">🏆</div>
+                <div class="cert-mini-info">
+                    <h4>{{ cert.course.title }}</h4>
+                    <p>{{ cert.issued_at|date:"d.m.Y" }}</p>
+                </div>
+                <a href="{% url 'certificates:certificate_detail' certificate_id=cert.pk %}" class="btn btn-outline btn-sm">Ko'rish</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

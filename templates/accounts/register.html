@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Ro'yxatdan o'tish{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card auth-card--wide">
+        <div class="auth-header">
+            <svg width="48" height="48" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#6366f1"/>
+                <path d="M8 22L16 10L24 22H8Z" fill="white" opacity="0.9"/>
+                <circle cx="16" cy="14" r="3" fill="white"/>
+            </svg>
+            <h1>EduSkill</h1>
+            <p>Yangi hisob yarating</p>
+        </div>
+
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">Ism</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <div class="form-errors">
+                        {% for error in form.first_name.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">Familiya</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <div class="form-errors">
+                        {% for error in form.last_name.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Foydalanuvchi nomi</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="form-errors">
+                    {% for error in form.username.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="form-errors">
+                    {% for error in form.email.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}">Parol</label>
+                    <div class="input-password-wrapper">
+                        {{ form.password1 }}
+                        <button type="button" class="toggle-password" onclick="togglePassword('{{ form.password1.id_for_label }}', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}
+                    <div class="form-errors">
+                        {% for error in form.password1.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}">Parolni tasdiqlang</label>
+                    <div class="input-password-wrapper">
+                        {{ form.password2 }}
+                        <button type="button" class="toggle-password" onclick="togglePassword('{{ form.password2.id_for_label }}', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                    <div class="form-errors">
+                        {% for error in form.password2.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Ro'yxatdan o'tish</button>
+        </form>
+
+        <p class="auth-footer">
+            Hisobingiz bormi? <a href="{% url 'accounts:login' %}">Kiring</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

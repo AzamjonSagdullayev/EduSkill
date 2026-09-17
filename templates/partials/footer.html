@@ -1,0 +1,54 @@
+{% load static %}
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{% url 'courses:home' %}" class="navbar-brand">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="#6366f1"/>
+                        <path d="M8 22L16 10L24 22H8Z" fill="white" opacity="0.9"/>
+                        <circle cx="16" cy="14" r="3" fill="white"/>
+                    </svg>
+                    <span>EduSkill</span>
+                </a>
+                <p>Zamonaviy kasblarni amaliy kurslar orqali o'rganing va o'z kelajagingizni yarating.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Platforma</h4>
+                <ul>
+                    <li><a href="{% url 'courses:course_list' %}">Barcha kurslar</a></li>
+                    <li><a href="{% url 'courses:category_list' %}">Kategoriyalar</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'enrollments:dashboard' %}">Dashboard</a></li>
+                    <li><a href="{% url 'certificates:certificate_list' %}">Sertifikatlar</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Hisob</h4>
+                <ul>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'accounts:profile' %}">Profilim</a></li>
+                    {% else %}
+                    <li><a href="{% url 'accounts:login' %}">Kirish</a></li>
+                    <li><a href="{% url 'accounts:register' %}">Ro'yxatdan o'tish</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>EduSkill</h4>
+                <ul>
+                    <li><span>Toshkent, O'zbekiston</span></li>
+                    <li><span>© 2026 EduSkill</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 EduSkill. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </div>
+</footer>

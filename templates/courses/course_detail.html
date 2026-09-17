@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<!-- Kurs bosh qismi -->
+<div class="course-hero">
+    <div class="container">
+        <div class="course-hero-layout">
+            <div class="course-hero-info">
+                <div class="course-breadcrumb">
+                    <a href="{% url 'courses:course_list' %}">Kurslar</a>
+                    <span>›</span>
+                    <a href="{% url 'courses:course_list' %}?category={{ course.category.slug }}">{{ course.category.name }}</a>
+                    <span>›</span>
+                    <span>{{ course.title }}</span>
+                </div>
+
+                <div class="course-badges">
+                    <span class="badge badge-category">{{ course.category.name }}</span>
+                    <span class="badge badge-level badge-level--{{ course.level }}">
+                        {% if course.level == 'beginner' %}Boshlang'ich
+                        {% elif course.level == 'middle' %}O'rta
+                        {% else %}Yuqori{% endif %}
+                    </span>
+                </div>
+
+                <h1>{{ course.title }}</h1>
+                <p class="course-hero-desc">{{ course.description }}</p>
+
+                <div class="course-meta-row">
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        {{ course.duration }} soat
+                    </span>
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        {{ lesson_count }} dars
+                    </span>
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        {{ quizzes.count }} quiz
+                    </span>
+                </div>
+            </div>
+
+            <!-- Kurs kartasi -->
+            <div class="course-enrollment-card">
+                {% if course.image %}
+                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="course-detail-img">
+                {% else %}
+                <div class="course-detail-img-placeholder">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                {% endif %}
+
+                <div class="enrollment-card-body">
+                    {% if course.price > 0 %}
+                    <div class="course-price-tag">{{ course.price|floatformat:0 }} so'm</div>
+                    {% else %}
+                    <div class="course-price-tag course-price-tag--free">Bepul</div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        {% if is_enrolled %}
+                        <div class="enrolled-status">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Yozilgansiz
+                        </div>
+                        {% if enrollment.progress > 0 %}
+                        <div class="progress-wrapper">
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: {{ enrollment.progress }}%"></div>
+                            </div>
+                            <span class="progress-text">{{ enrollment.progress }}% bajarildi</span>
+                        </div>
+                        {% endif %}
+                        {% if lessons %}
+                        <a href="{% url 'enrollments:lesson_detail' course_slug=course.slug lesson_id=lessons.first.pk %}" class="btn btn-primary btn-block">
+                            {% if enrollment.progress > 0 %}Davom ettirish{% else %}Boshlash{% endif %}
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <form method="post" action="{% url 'enrollments:enroll' course_id=course.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-block">Kursga yozilish</button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary btn-block">Kursga yozilish uchun kiring</a>
+                    {% endif %}
+
+                    <div class="course-includes">
+                        <h4>Kurs ichida:</h4>
+                        <ul>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                {{ lesson_count }} ta video dars
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {{ course.duration }} soat material
+                            </li>
+                            {% if quizzes.count > 0 %}
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                {{ quizzes.count }} ta quiz
+                            </li>
+                            {% endif %}
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Sertifikat
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Darslar ro'yxati -->
+<div class="container page-container">
+    <div class="course-content-layout">
+        <div class="course-lessons-section">
+            <h2>Kurs dasturi</h2>
+            <p class="text-muted">{{ lesson_count }} ta dars · {{ course.duration }} soat</p>
+
+            {% if lessons %}
+            <div class="lessons-accordion">
+                {% for lesson in lessons %}
+                <div class="lesson-item">
+                    <div class="lesson-item-info">
+                        <span class="lesson-number">{{ forloop.counter }}</span>
+                        <div>
+                            <div class="lesson-title">
+                                {% if is_enrolled %}
+                                <a href="{% url 'enrollments:lesson_detail' course_slug=course.slug lesson_id=lesson.pk %}">{{ lesson.title }}</a>
+                                {% else %}
+                                {{ lesson.title }}
+                                {% endif %}
+                            </div>
+                            {% if lesson.description %}
+                            <p class="lesson-desc">{{ lesson.description|truncatechars:80 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="lesson-item-meta">
+                        {% if lesson.is_free %}
+                        <span class="badge badge-free">Bepul</span>
+                        {% endif %}
+                        {% if lesson.duration %}
+                        <span class="lesson-duration">{{ lesson.duration }} daq</span>
+                        {% endif %}
+                        {% if is_enrolled %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        {% else %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state-block">
+                <p>Hozircha darslar qo'shilmagan.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quizlar -->
+        {% if quizzes %}
+        <div class="course-quizzes-section">
+            <h3>Quizlar</h3>
+            {% for quiz in quizzes %}
+            <div class="quiz-preview-card">
+                <div>
+                    <h4>{{ quiz.title }}</h4>
+                    {% if quiz.description %}<p>{{ quiz.description }}</p>{% endif %}
+                    <span class="text-muted">Vaqt chegarasi: {{ quiz.time_limit }} daqiqa</span>
+                </div>
+                {% if is_enrolled %}
+                <a href="{% url 'quizzes:quiz_detail' quiz_id=quiz.pk %}" class="btn btn-outline btn-sm">Boshlash</a>
+                {% else %}
+                <span class="btn btn-outline btn-sm" style="opacity:0.5">🔒 Yopiq</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

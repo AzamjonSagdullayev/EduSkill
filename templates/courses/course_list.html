@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Kurslar{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Sarlavha -->
+    <div class="page-header">
+        <h1>Barcha kurslar</h1>
+        <p>O'zingizga mos kursni toping va o'rganishni boshlang</p>
+    </div>
+
+    <!-- Filter va qidiruv -->
+    <div class="filters-bar">
+        <form method="get" class="filters-form" id="filtersForm">
+            <div class="search-input-wrapper">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" name="q" value="{{ query }}" class="search-input" placeholder="Kurs qidirish...">
+                {% if query %}
+                <a href="{% url 'courses:course_list' %}" class="search-clear">×</a>
+                {% endif %}
+            </div>
+
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">Barcha kategoriyalar</option>
+                {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="level" class="form-select" onchange="this.form.submit()">
+                <option value="">Barcha darajalar</option>
+                {% for val, label in levels %}
+                <option value="{{ val }}" {% if val == selected_level %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary btn-sm">Qidirish</button>
+
+            {% if query or selected_category or selected_level %}
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline btn-sm">Tozalash</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Natija -->
+    {% if query or selected_category or selected_level %}
+    <div class="filter-result-info">
+        <p>
+            {% if page_obj.paginator.count > 0 %}
+            <strong>{{ page_obj.paginator.count }}</strong> ta kurs topildi
+            {% if query %} "<em>{{ query }}</em>" bo'yicha{% endif %}
+            {% else %}
+            Hech qanday kurs topilmadi.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Kurslar -->
+    {% if page_obj.object_list %}
+    <div class="courses-grid">
+        {% for course in page_obj %}
+        {% include 'partials/course_card.html' with course=course %}
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_level %}level={{ selected_level }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-btn">← Oldingi</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="page-btn page-btn--active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_level %}level={{ selected_level }}&{% endif %}page={{ num }}" class="page-btn">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_level %}level={{ selected_level }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-btn">Keyingi →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state-block">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h3>Kurslar topilmadi</h3>
+        <p>Boshqa kalit so'z bilan qidirib ko'ring yoki filtrlarni tozalang.</p>
+        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Barcha kurslar</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

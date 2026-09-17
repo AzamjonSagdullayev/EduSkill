@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Sertifikatlarim{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <div class="page-header">
+        <h1>Sertifikatlar</h1>
+        <p>Tugatilgan kurslar uchun sertifikatlar</p>
+    </div>
+
+    {% if certificates %}
+    <div class="certs-grid-main">
+        {% for cert in certificates %}
+        <div class="cert-card">
+            <div class="cert-card-icon">🏆</div>
+            <div class="cert-card-body">
+                <h3>{{ cert.course.title }}</h3>
+                <p class="text-muted">Berilgan: {{ cert.issued_at|date:"d MMMM, Y" }}</p>
+                <p class="cert-number text-muted">№ {{ cert.certificate_number }}</p>
+            </div>
+            <a href="{% url 'certificates:certificate_detail' certificate_id=cert.pk %}" class="btn btn-primary btn-sm">Ko'rish</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-block">
+        <span style="font-size:4rem">🏆</span>
+        <h3>Hali sertifikatlar yo'q</h3>
+        <p>Kurslarni tugatib, sertifikat oling!</p>
+        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Kurslarni ko'rish</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

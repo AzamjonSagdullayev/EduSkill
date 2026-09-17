@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bosh sahifa{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <div class="hero-content">
+            <span class="hero-badge">🚀 Kelajak uchun ta'lim</span>
+            <h1 class="hero-title">Kelajak kasbingizni <span class="text-gradient">bugundan boshlang</span></h1>
+            <p class="hero-subtitle">Zamonaviy kasblarni amaliy kurslar orqali o'rganing va o'z kelajagingizni yarating.</p>
+            <div class="hero-actions">
+                <a href="{% url 'courses:course_list' %}" class="btn btn-primary btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    Kurslarni ko'rish
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline btn-lg">Boshlash</a>
+                {% else %}
+                <a href="{% url 'enrollments:dashboard' %}" class="btn btn-outline btn-lg">Dashboard</a>
+                {% endif %}
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong>{{ total_courses }}+</strong>
+                    <span>Kurs</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <strong>{{ total_categories }}+</strong>
+                    <span>Kategoriya</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <strong>100%</strong>
+                    <span>Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- KATEGORIYALAR -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Kategoriyalar</h2>
+            <a href="{% url 'courses:category_list' %}" class="btn btn-outline btn-sm">Barchasini ko'rish</a>
+        </div>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'courses:course_list' %}?category={{ category.slug }}" class="category-card">
+                {% if category.image %}
+                <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-img">
+                {% else %}
+                <div class="category-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                {% endif %}
+                <h3>{{ category.name }}</h3>
+                <p>{{ category.courses.filter.is_active|default:'' }}{{ category.courses.count }} kurs</p>
+            </a>
+            {% empty %}
+            <p class="empty-state">Hozircha kategoriyalar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- MASHHUR KURSLAR -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Mashhur kurslar</h2>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline btn-sm">Barchasini ko'rish</a>
+        </div>
+        <div class="courses-grid">
+            {% for course in popular_courses %}
+            {% include 'partials/course_card.html' with course=course %}
+            {% empty %}
+            <div class="empty-state-block">
+                <p>Hozircha kurslar mavjud emas.</p>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Kurslarni ko'rish</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- AFZALLIKLAR -->
+<section class="section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2 class="section-title">Nima uchun EduSkill?</h2>
+            <p class="section-subtitle">O'z sohasining eng yaxshi mutaxassislaridan o'rganing</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon feature-icon--blue">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>Ekspert o'qituvchilar</h3>
+                <p>Soha mutaxassislaridan amaliy bilim oling.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon feature-icon--purple">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h3>Sertifikat oling</h3>
+                <p>Kursni muvaffaqiyatli tugatgandan so'ng rasmiy sertifikat oling.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon feature-icon--green">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>O'z tezligingizda</h3>
+                <p>Istalgan vaqt, istalgan joydan o'rganing.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon feature-icon--orange">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <h3>Progress kuzatish</h3>
+                <p>O'z rivojlanishingizni real vaqtda kuzating.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QANDAY ISHLAYDI -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2 class="section-title">Qanday ishlaydi?</h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Ro'yxatdan o'ting</h3>
+                <p>Bepul hisob yarating va platformaga kiring.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Kurs tanlang</h3>
+                <p>Qiziqishingizga mos kursni toping va yoziling.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>O'rganing</h3>
+                <p>Darslarni o'rganing, testlar ishlang.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Sertifikat oling</h3>
+                <p>Kursni tugatib, sertifikatni yuklab oling.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+{% if not user.is_authenticated %}
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Bugun boshlamoqchimisiz?</h2>
+            <p>Minglab talabalar bilan birga o'rganishni boshlang.</p>
+            <div class="cta-actions">
+                <a href="{% url 'accounts:register' %}" class="btn btn-white btn-lg">Bepul ro'yxatdan o'tish</a>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-white btn-lg">Kurslarni ko'rish</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
