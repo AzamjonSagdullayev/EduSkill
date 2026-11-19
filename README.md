@@ -1,5 +1,7 @@
 # 🎓 EduSkill
 
+Docker yordamida ishga tushirish, demo akkauntlar va serverga joylash bo'yicha ko'rsatma: [DOCKER.md](DOCKER.md).
+
 **EduSkill** — zamonaviy kasblarni o‘rganishni istagan yoshlar uchun yaratilgan zamonaviy ta’lim platformasi.
 
 Platforma orqali foydalanuvchilar turli yo‘nalishlardagi kurslarni ko‘rishi, kurslarga yozilishi, darslarni o‘rganishi, testlardan o‘tishi, o‘z progressini kuzatishi va kursni muvaffaqiyatli tugatgandan so‘ng sertifikat olishi mumkin.
