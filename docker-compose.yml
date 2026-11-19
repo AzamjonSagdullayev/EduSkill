@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-eduskill}
+      POSTGRES_USER: ${DB_USER:-eduskill}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eduskill_demo_db_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-replace-this-secret-before-deployment}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+      DB_NAME: ${DB_NAME:-eduskill}
+      DB_USER: ${DB_USER:-eduskill}
+      DB_PASSWORD: ${DB_PASSWORD:-eduskill_demo_db_password}
+      DB_HOST: db
+      DB_PORT: 5432
+      SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-False}
+      SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-0}
+      SECURE_HSTS_INCLUDE_SUBDOMAINS: ${SECURE_HSTS_INCLUDE_SUBDOMAINS:-False}
+      SECURE_HSTS_PRELOAD: ${SECURE_HSTS_PRELOAD:-False}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-False}
+      CSRF_COOKIE_SECURE: ${CSRF_COOKIE_SECURE:-False}
+      DEMO_ADMIN_USERNAME: ${DEMO_ADMIN_USERNAME:-admin}
+      DEMO_ADMIN_EMAIL: ${DEMO_ADMIN_EMAIL:-admin@example.com}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-ChangeMe-Admin-2026!}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - media_data:/app/media
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        python manage.py migrate --noinput &&
+        python manage.py seed_demo &&
+        python manage.py collectstatic --noinput &&
+        gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+        --access-logfile - --error-logfile -
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  media_data:

@@ -1,0 +1,71 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# FastAPI / Python cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node.js / Frontend
+node_modules/
+dist/
+build/
+.vite/
+
+# Docker
+docker-compose.override.yml
+
+# SSL certificates / keys
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.tmp
+
+# Git
+.git/
+.gitignore
